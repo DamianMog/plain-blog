@@ -4,7 +4,7 @@ A fast, content-first blog template with **zero client-side JavaScript**, built 
 
 **Live demo:** https://demo.mikrus.dev
 
-The design is a warm, monospaced, text-first layout inspired by the personal site [lucianonooijen.com](https://lucianonooijen.com/). All code, styles and content in this repository are original.
+The design is inspired by the personal site and blog of [Luciano Nooijen](https://lucianonooijen.com/): a warm, monospaced, text-first layout with no trackers, no ads and no JavaScript requirement. See [Inspiration](#inspiration).
 
 ## Features
 
@@ -131,6 +131,12 @@ Point your web server's document root at `<DEPLOY_PATH>/current`. A ready-to-ada
 ## Notes on the demo content
 
 The demo site's author, employers and links are fictional placeholder content. Replace the files in `src/content` and the values in `site.config.ts` with your own.
+
+## Inspiration
+
+This template is inspired by [lucianonooijen.com](https://lucianonooijen.com/), the personal site and blog of Luciano Nooijen, a freelance software engineer. Several ideas come from there: the monospaced typeface on a warm paper background, the minimal navigation (About, Expertise, Experience, Blog, Contact), the blog index with categories, reading time and tags, and the principle that a website should be simple, content-first and free of trackers and ads.
+
+It is not a copy or a fork. The original site is built with Hugo and its source is published under AGPL-3.0, while everything in this repository (code, styles and demo content) was written from scratch for Astro and is released under the MIT license. If you like this style, go and read the original blog.
 
 ## License
 
