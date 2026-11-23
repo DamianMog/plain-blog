@@ -19,7 +19,16 @@ export async function getStaticPaths() {
 const { post, newer, older } = Astro.props;
 const { Content, headings } = await render(post);
 const minutes = readingTime(post.body);
-const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+// Group h3 headings under the h2 before them. The footnote section's hidden
+// heading is skipped, because it is not part of the post's own structure.
+type TocItem = { slug: string; text: string; children: { slug: string; text: string }[] };
+const tocItems: TocItem[] = [];
+for (const h of headings) {
+  if (h.slug === 'footnote-label') continue;
+  if (h.depth === 2) tocItems.push({ slug: h.slug, text: h.text, children: [] });
+  else if (h.depth === 3 && tocItems.length > 0) tocItems[tocItems.length - 1].children.push(h);
+}
 ---
 
 <BaseLayout
@@ -60,8 +69,17 @@ const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
             <strong>Contents</strong>
             <ol>
               {tocItems.map((h) => (
-                <li style={h.depth === 3 ? 'margin-left: 2rem; list-style-type: circle;' : undefined}>
+                <li>
                   <a href={`#${h.slug}`}>{h.text}</a>
+                  {h.children.length > 0 && (
+                    <ol>
+                      {h.children.map((c) => (
+                        <li>
+                          <a href={`#${c.slug}`}>{c.text}</a>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
                 </li>
               ))}
             </ol>
