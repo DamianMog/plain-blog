@@ -1,10 +1,31 @@
-# plain-blog
+# plain-blog: a minimal Astro blog template with zero JavaScript
 
-A fast, content-first blog template with **zero client-side JavaScript**, built with [Astro](https://astro.build). You write Markdown, the build step produces static HTML, and any web server can host the result.
+[![CI](https://github.com/DamianMog/plain-blog/actions/workflows/ci.yml/badge.svg)](https://github.com/DamianMog/plain-blog/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Built with Astro](https://img.shields.io/badge/built%20with-Astro-ff5d01.svg?logo=astro&logoColor=white)](https://astro.build)
+![Node.js 22.23.4+](https://img.shields.io/badge/node-%E2%89%A5%2022.23.4-339933.svg?logo=nodedotjs&logoColor=white)
+![Client-side JavaScript: 0 KB](https://img.shields.io/badge/client--side%20JS-0%20KB-brightgreen.svg)
+[![Live demo](https://img.shields.io/badge/demo-demo.mikrus.dev-8b4513.svg)](https://demo.mikrus.dev)
 
-**Live demo:** https://demo.mikrus.dev
+**plain-blog** is a free, open-source blog and personal website template for [Astro](https://astro.build). You write Markdown, the build produces plain static HTML and CSS, and any web server can host the result. No trackers, no ads, no cookies and no client-side JavaScript.
 
-The design is inspired by the personal site and blog of [Luciano Nooijen](https://lucianonooijen.com/): a warm, monospaced, text-first layout with no trackers, no ads and no JavaScript requirement. See [Inspiration](#inspiration).
+[**Live demo**](https://demo.mikrus.dev) · [Quick start](#quick-start) · [Features](#features) · [Writing posts](#writing) · [Deploying](#deploying) · [Inspiration](#inspiration)
+
+| Light mode | Dark mode |
+| --- | --- |
+| ![plain-blog post page in light mode, showing callouts, tags and reading time](docs/preview-light.png) | ![plain-blog post page in dark mode, showing callouts, tags and reading time](docs/preview-dark.png) |
+
+The design is inspired by the personal site and blog of [Luciano Nooijen](https://lucianonooijen.com/): a warm, monospaced, text-first layout. See [Inspiration](#inspiration).
+
+## Why plain-blog?
+
+- **Fast.** A typical post, including its code highlighting and self-hosted font, weighs under 50 KB transferred.
+- **Private.** No analytics, no third-party requests, no consent banner needed.
+- **Durable.** The output is HTML and CSS, so it keeps working long after today's frameworks have moved on.
+- **Easy to own.** Posts are Markdown files in Git. There is no database and no admin panel to maintain.
+- **Complete enough.** Categories, tags, RSS, sitemap, dark mode, syntax highlighting and SEO metadata are included, so you can start writing on day one.
+
+Good for personal blogs, developer portfolios, project documentation notes and digital gardens.
 
 ## Features
 

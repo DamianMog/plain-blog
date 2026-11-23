@@ -2,6 +2,27 @@
   "name": "plain-blog",
   "version": "1.0.0",
   "description": "A fast, content-first, zero-JavaScript blog template built with Astro.",
+  "keywords": [
+    "astro",
+    "astro-template",
+    "blog",
+    "blog-template",
+    "static-site",
+    "markdown",
+    "rss",
+    "dark-mode",
+    "minimal",
+    "no-javascript",
+    "personal-website"
+  ],
+  "homepage": "https://demo.mikrus.dev",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DamianMog/plain-blog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DamianMog/plain-blog/issues"
+  },
   "type": "module",
   "license": "MIT",
   "engines": {
