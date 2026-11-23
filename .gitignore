@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.astro/
+
+.env
+.env.*
+!.env.example
+
+*.log
+.DS_Store
+Thumbs.db
+
+# Never commit credentials
+*.enc
+*.pem
+id_ed25519*
+id_rsa*

@@ -1,0 +1,23 @@
+{
+  "name": "plain-blog",
+  "version": "1.0.0",
+  "description": "A fast, content-first, zero-JavaScript blog template built with Astro.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "dependencies": {
+    "@astrojs/markdown-remark": "^7.3.10",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.6",
+    "@fontsource/noto-sans-mono": "^5.3.0",
+    "astro": "^7.3.8"
+  }
+}

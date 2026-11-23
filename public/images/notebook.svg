@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" role="img" aria-label="A simple drawing of an open notebook with a pencil">
+  <style>
+    .paper { fill: #f7f3e8; stroke: #6b655b; stroke-width: 2; }
+    .spine { stroke: #6b655b; stroke-width: 2; }
+    .line { stroke: #bdb6a6; stroke-width: 2; }
+    .pencil { fill: #cd4416; stroke: #6b655b; stroke-width: 2; }
+    .tip { fill: #2e2b26; }
+    @media (prefers-color-scheme: dark) {
+      .paper { fill: #2d2a25; stroke: #a29b8e; }
+      .spine { stroke: #a29b8e; }
+      .line { stroke: #4a463f; }
+      .pencil { fill: #ff9a62; stroke: #a29b8e; }
+      .tip { fill: #e6e1d6; }
+    }
+  </style>
+  <path class="paper" d="M40 40 H235 V220 H40 Z" />
+  <path class="paper" d="M245 40 H440 V220 H245 Z" />
+  <path class="spine" d="M240 36 V224" />
+  <g class="line">
+    <path d="M62 80 H215" /><path d="M62 108 H215" /><path d="M62 136 H215" /><path d="M62 164 H215" /><path d="M62 192 H180" />
+    <path d="M267 80 H420" /><path d="M267 108 H420" /><path d="M267 136 H380" />
+  </g>
+  <path class="pencil" d="M330 220 L420 150 L432 162 L342 232 Z" />
+  <path class="tip" d="M330 220 L342 232 L322 238 Z" />
+</svg>

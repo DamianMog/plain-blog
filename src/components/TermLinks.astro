@@ -1,0 +1,19 @@
+---
+import { slugify } from '../utils/posts';
+
+interface Props {
+  kind: 'categories' | 'tags';
+  terms: string[];
+}
+
+const { kind, terms } = Astro.props;
+---
+
+{
+  terms.map((term, i) => (
+    <>
+      {i > 0 && ', '}
+      <a href={`/${kind}/${slugify(term)}/`}>{term}</a>
+    </>
+  ))
+}

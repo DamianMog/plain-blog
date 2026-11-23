@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 170" role="img" aria-labelledby="t d">
+  <title id="t">How the build works</title>
+  <desc id="d">Markdown files go through the Astro build and become static HTML, which Nginx serves to readers.</desc>
+  <style>
+    .box { fill: #e1dccf; stroke: #8b4513; stroke-width: 2; }
+    .label { fill: #2e2b26; font: 600 15px 'Noto Sans Mono', ui-monospace, Menlo, Consolas, monospace; text-anchor: middle; }
+    .sub { fill: #6b655b; font: 400 12px 'Noto Sans Mono', ui-monospace, Menlo, Consolas, monospace; text-anchor: middle; }
+    .arrow { stroke: #8b4513; stroke-width: 2; fill: none; }
+    .head { fill: #8b4513; }
+    @media (prefers-color-scheme: dark) {
+      .box { fill: #2d2a25; stroke: #e0a070; }
+      .label { fill: #e6e1d6; }
+      .sub { fill: #a29b8e; }
+      .arrow { stroke: #e0a070; }
+      .head { fill: #e0a070; }
+    }
+  </style>
+
+  <rect class="box" x="10" y="45" width="150" height="80" rx="8" />
+  <text class="label" x="85" y="82">Markdown</text>
+  <text class="sub" x="85" y="102">you write</text>
+
+  <rect class="box" x="215" y="45" width="150" height="80" rx="8" />
+  <text class="label" x="290" y="82">Astro build</text>
+  <text class="sub" x="290" y="102">npm run build</text>
+
+  <rect class="box" x="420" y="45" width="150" height="80" rx="8" />
+  <text class="label" x="495" y="82">Static HTML</text>
+  <text class="sub" x="495" y="102">the dist folder</text>
+
+  <rect class="box" x="625" y="45" width="125" height="80" rx="8" />
+  <text class="label" x="687" y="82">Nginx</text>
+  <text class="sub" x="687" y="102">serves it</text>
+
+  <path class="arrow" d="M160 85 H205" />
+  <path class="head" d="M205 79 L215 85 L205 91 Z" />
+  <path class="arrow" d="M365 85 H410" />
+  <path class="head" d="M410 79 L420 85 L410 91 Z" />
+  <path class="arrow" d="M570 85 H615" />
+  <path class="head" d="M615 79 L625 85 L615 91 Z" />
+</svg>

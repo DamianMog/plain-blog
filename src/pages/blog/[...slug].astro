@@ -1,0 +1,100 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TermLinks from '../../components/TermLinks.astro';
+import { formatDate, getPosts, isoDate, readingTime } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, index) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      newer: posts[index - 1],
+      older: posts[index + 1],
+    },
+  }));
+}
+
+const { post, newer, older } = Astro.props;
+const { Content, headings } = await render(post);
+const minutes = readingTime(post.body);
+const tocItems = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+  type="article"
+  publishedTime={post.data.pubDate}
+>
+  <article class="container post">
+    <header class="post-header">
+      <h1>{post.data.title}</h1>
+      <h2 class="date">
+        <time datetime={isoDate(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+        {
+          post.data.updatedDate && (
+            <span> (updated <time datetime={isoDate(post.data.updatedDate)}>{formatDate(post.data.updatedDate)}</time>)</span>
+          )
+        }
+      </h2>
+      <p class="post-meta"><strong>Reading time:</strong> {minutes} {minutes === 1 ? 'minute' : 'minutes'}</p>
+      {
+        post.data.categories.length > 0 && (
+          <p class="post-meta">
+            <strong>Categories:</strong> <TermLinks kind="categories" terms={post.data.categories} />
+          </p>
+        )
+      }
+      {
+        post.data.tags.length > 0 && (
+          <p class="post-meta">
+            <strong>Tags:</strong> <TermLinks kind="tags" terms={post.data.tags} />
+          </p>
+        )
+      }
+      {
+        post.data.toc && tocItems.length > 0 && (
+          <nav class="toc" aria-label="Table of contents">
+            <strong>Contents</strong>
+            <ol>
+              {tocItems.map((h) => (
+                <li style={h.depth === 3 ? 'margin-left: 2rem; list-style-type: circle;' : undefined}>
+                  <a href={`#${h.slug}`}>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+    </header>
+
+    <div class="post-body">
+      <Content />
+    </div>
+
+    <hr class="end-of-post" />
+
+    <nav class="post-nav" aria-label="More posts">
+      {
+        older ? (
+          <div class="prev">
+            <small>&larr; Older</small>
+            <a href={`/blog/${older.id}/`}>{older.data.title}</a>
+          </div>
+        ) : (
+          <div />
+        )
+      }
+      {
+        newer && (
+          <div class="next">
+            <small>Newer &rarr;</small>
+            <a href={`/blog/${newer.id}/`}>{newer.data.title}</a>
+          </div>
+        )
+      }
+    </nav>
+  </article>
+</BaseLayout>

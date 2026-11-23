@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts, groupBy } from '../../utils/posts';
+
+const posts = await getPosts();
+const categories = groupBy(posts, 'categories');
+---
+
+<BaseLayout title="Blog" description="All posts, newest first.">
+  <section class="container narrow">
+    <h1>Blog</h1>
+    <p>Posts are also available as an <a href="/rss.xml">RSS feed</a>.</p>
+
+    <p class="taxonomy-bar">
+      <strong>Categories:</strong> <em>all</em>
+      <br />
+      {
+        categories.map((term, i) => (
+          <>
+            {i > 0 && ' | '}
+            <a href={`/categories/${term.slug}/`}>{term.label}</a>
+          </>
+        ))
+      }
+    </p>
+    <p class="taxonomy-bar"><a href="/tags/">Browse by tag</a></p>
+
+    <PostList posts={posts} />
+  </section>
+</BaseLayout>

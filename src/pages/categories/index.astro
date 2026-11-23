@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, groupBy } from '../../utils/posts';
+
+const terms = groupBy(await getPosts(), 'categories');
+---
+
+<BaseLayout title="Categories">
+  <section class="container narrow">
+    <h1>Categories</h1>
+    <ul class="term-cloud">
+      {
+        terms.map((term) => (
+          <li>
+            <a href={`/categories/${term.slug}/`}>{term.label}</a>
+            <span class="count">({term.posts.length})</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p><a href="/blog/">&larr; All posts</a></p>
+  </section>
+</BaseLayout>

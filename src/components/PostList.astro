@@ -1,0 +1,24 @@
+---
+import type { Post } from '../utils/posts';
+import { formatDate, isoDate } from '../utils/posts';
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+<ul class="post-list">
+  {
+    posts.map((post) => (
+      <li>
+        <a href={`/blog/${post.id}/`}>
+          {post.data.title}
+          {post.data.draft && <span class="badge">draft</span>}
+        </a>
+        <time datetime={isoDate(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+      </li>
+    ))
+  }
+</ul>

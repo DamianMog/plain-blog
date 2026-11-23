@@ -1,0 +1,40 @@
+# Example Nginx server block for a site deployed with scripts/deploy.sh.
+# Copy it to /etc/nginx/sites-available/my-blog, adjust server_name and root,
+# then enable it:
+#
+#   sudo ln -s /etc/nginx/sites-available/my-blog /etc/nginx/sites-enabled/my-blog
+#   sudo nginx -t && sudo systemctl reload nginx
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name example.com;
+
+    root /var/www/my-blog/current;
+    index index.html;
+
+    charset utf-8;
+
+    # Compress text responses.
+    gzip on;
+    gzip_types text/css application/javascript image/svg+xml application/xml application/rss+xml;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    error_page 404 /404.html;
+
+    # Fingerprinted build assets never change, so they can be cached for a year.
+    location /_astro/ {
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # Everything else should be revalidated, so new posts show up right away.
+    location ~* \.(html|xml|txt)$ {
+        add_header Cache-Control "no-cache";
+    }
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+}

@@ -1,0 +1,31 @@
+---
+import { site } from '../../site.config';
+
+const current = Astro.url.pathname;
+const isActive = (href: string) => current === href || current.startsWith(href);
+---
+
+<header class="container">
+  <nav class="topnav" aria-label="Main">
+    <a class="topnav-title" href="/">{site.title}</a>
+
+    <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle menu" />
+    <label for="nav-toggle" class="nav-burger">Menu</label>
+
+    <ul class="topnav-list">
+      {
+        site.nav.map((item) => (
+          <li>
+            <a
+              class:list={['topnav-link', { active: isActive(item.href) }]}
+              href={item.href}
+              aria-current={isActive(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostList from '../../components/PostList.astro';
+import { getPosts, groupBy } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const terms = groupBy(await getPosts(), 'categories');
+  return terms.map((term) => ({ params: { slug: term.slug }, props: { term } }));
+}
+
+const { term } = Astro.props;
+---
+
+<BaseLayout title={`Category: ${term.label}`}>
+  <section class="container narrow">
+    <h1>Category: {term.label}</h1>
+    <PostList posts={term.posts} />
+    <p><a href="/categories/">&larr; All categories</a></p>
+  </section>
+</BaseLayout>
