@@ -11,6 +11,14 @@ export const site = {
   author: 'Alex Morgan',
   language: 'en',
 
+  // Used to format dates, for example 'en-US', 'en-GB' or 'pl-PL'.
+  // The interface text itself (labels such as "Reading time") is English and
+  // lives in the components under src/components and src/pages.
+  locale: 'en-US',
+
+  // Dates are shown in this IANA time zone, for example 'Europe/Warsaw'.
+  timeZone: 'UTC',
+
   // Top navigation. `href` is relative to the site root.
   nav: [
     { label: 'About', href: '/about/' },
@@ -35,7 +43,7 @@ export const site = {
 
   footer: {
     note: 'Built the way the web was meant to be: simple, content-first, no trackers, no ads and no JavaScript required.',
-    license: 'Posts: CC BY-SA 4.0 | Source code: MIT',
+    license: 'Released under the MIT license',
   },
 
   // Average adult reading speed used for the "Reading time" label.

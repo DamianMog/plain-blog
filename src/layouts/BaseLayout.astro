@@ -15,9 +15,11 @@ interface Props {
   description?: string;
   type?: 'website' | 'article';
   publishedTime?: Date;
+  /** Keep the page out of search results and skip canonical URLs (used by the 404 page). */
+  noindex?: boolean;
 }
 
-const { title, description = site.description, type = 'website', publishedTime } = Astro.props;
+const { title, description = site.description, type = 'website', publishedTime, noindex = false } = Astro.props;
 const pageTitle = title ? `${title} | ${site.title}` : site.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -31,7 +33,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="description" content={description} />
     <meta name="author" content={site.author} />
     <meta name="color-scheme" content="light dark" />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate" type="application/rss+xml" title={site.title} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
@@ -40,7 +42,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:site_name" content={site.title} />
     <meta property="og:title" content={title ?? site.title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     {publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
     <meta name="twitter:card" content="summary" />
   </head>

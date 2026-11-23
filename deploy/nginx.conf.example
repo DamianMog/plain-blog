@@ -4,6 +4,10 @@
 #
 #   sudo ln -s /etc/nginx/sites-available/my-blog /etc/nginx/sites-enabled/my-blog
 #   sudo nginx -t && sudo systemctl reload nginx
+#
+# Note on add_header: Nginx only inherits add_header directives from the server
+# level into a location block when that location has none of its own. Locations
+# that set Cache-Control therefore repeat the security headers.
 
 server {
     listen 80;
@@ -15,9 +19,17 @@ server {
 
     charset utf-8;
 
+    # Redirects such as /about -> /about/ stay relative. Without this, Nginx
+    # builds an absolute http:// URL, which breaks sites behind a proxy or CDN
+    # that terminates HTTPS in front of this server.
+    absolute_redirect off;
+
     # Compress text responses.
     gzip on;
     gzip_types text/css application/javascript image/svg+xml application/xml application/rss+xml;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 
     location / {
         try_files $uri $uri/ =404;
@@ -28,13 +40,34 @@ server {
     # Fingerprinted build assets never change, so they can be cached for a year.
     location /_astro/ {
         add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     }
 
-    # Everything else should be revalidated, so new posts show up right away.
+    # Everything else is revalidated, so new posts show up right away.
     location ~* \.(html|xml|txt)$ {
         add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
     }
-
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }
+
+# With your own certificate (for example from Certbot), serve HTTPS directly
+# and redirect plain HTTP. Certbot can generate this part for you.
+#
+# server {
+#     listen 80;
+#     listen [::]:80;
+#     server_name example.com;
+#     return 301 https://example.com$request_uri;
+# }
+#
+# server {
+#     listen 443 ssl http2;
+#     listen [::]:443 ssl http2;
+#     server_name example.com;
+#     ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+#     add_header Strict-Transport-Security "max-age=31536000" always;
+#     # ...same root, locations and headers as above...
+# }

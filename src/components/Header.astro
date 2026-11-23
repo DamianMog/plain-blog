@@ -2,10 +2,12 @@
 import { site } from '../../site.config';
 
 const current = Astro.url.pathname;
-const isActive = (href: string) => current === href || current.startsWith(href);
+// Highlight the section (for example the blog while reading a post), but only
+// mark the exact page as the current page for assistive technology.
+const inSection = (href: string) => current === href || current.startsWith(href);
 ---
 
-<header class="container">
+<header class="container site-header">
   <nav class="topnav" aria-label="Main">
     <a class="topnav-title" href="/">{site.title}</a>
 
@@ -17,9 +19,9 @@ const isActive = (href: string) => current === href || current.startsWith(href);
         site.nav.map((item) => (
           <li>
             <a
-              class:list={['topnav-link', { active: isActive(item.href) }]}
+              class:list={['topnav-link', { active: inSection(item.href) }]}
               href={item.href}
-              aria-current={isActive(item.href) ? 'page' : undefined}
+              aria-current={current === item.href ? 'page' : undefined}
             >
               {item.label}
             </a>

@@ -11,13 +11,48 @@ export async function getPosts(): Promise<Post[]> {
   return posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 }
 
+// Letters that Unicode normalisation cannot reduce to a plain Latin letter.
+const TRANSLITERATE: Record<string, string> = {
+  ł: 'l',
+  đ: 'd',
+  ø: 'o',
+  ð: 'd',
+  þ: 'th',
+  ß: 'ss',
+  æ: 'ae',
+  œ: 'oe',
+  ı: 'i',
+};
+
+// Symbols that carry meaning in names such as "C++" or "C#".
+const SYMBOLS: Record<string, string> = {
+  '+': ' plus ',
+  '#': ' sharp ',
+  '&': ' and ',
+};
+
+function hash(value: string): string {
+  let h = 5381;
+  for (const char of value) h = ((h << 5) + h + char.codePointAt(0)!) >>> 0;
+  return h.toString(36);
+}
+
+/**
+ * Turn a category or tag label into a URL segment.
+ * "Łódź" -> "lodz", "C++" -> "c-plus-plus", "日本語" -> "日本語".
+ * Labels without any letter or digit (such as an emoji) get a stable hash.
+ */
 export function slugify(value: string): string {
-  return value
+  const slug = value
+    .toLowerCase()
+    .replace(/[łđøðþßæœı]/g, (char) => TRANSLITERATE[char])
+    .replace(/[+#&]/g, (char) => SYMBOLS[char])
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
+
+  return slug || `term-${hash(value)}`;
 }
 
 export function readingTime(body: string | undefined): number {
@@ -25,17 +60,19 @@ export function readingTime(body: string | undefined): number {
   return Math.max(1, Math.round(words / site.wordsPerMinute));
 }
 
+/** Human readable date, in the site's locale and time zone. */
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(site.locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-    timeZone: 'UTC',
+    timeZone: site.timeZone,
   });
 }
 
+/** YYYY-MM-DD in the site's time zone, for <time datetime="..."> attributes. */
 export function isoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return date.toLocaleDateString('en-CA', { timeZone: site.timeZone });
 }
 
 export interface Term {
@@ -51,7 +88,9 @@ export function groupBy(posts: Post[], field: 'categories' | 'tags'): Term[] {
     for (const label of post.data[field]) {
       const slug = slugify(label);
       const term = terms.get(slug) ?? { slug, label, posts: [] };
-      term.posts.push(post);
+      // Labels that share a slug ("Node.js" and "node js") are the same term,
+      // and a post carrying both must still be listed only once.
+      if (!term.posts.includes(post)) term.posts.push(post);
       terms.set(slug, term);
     }
   }

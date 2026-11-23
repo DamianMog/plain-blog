@@ -29,19 +29,20 @@ Good for personal blogs, developer portfolios, project documentation notes and d
 
 ## Features
 
-- **Pages and posts as Markdown.** Home, About, Expertise, Experience, Contact and a blog, all editable as plain files.
+- **Pages and posts as Markdown.** About, Expertise, Experience and Contact are plain Markdown files, the blog is a folder of posts, and the home page takes its texts from `site.config.ts`.
 - **Categories and tags**, with overview pages and a page per term.
 - **Reading time**, previous/next post links and an optional table of contents per post.
 - **Syntax highlighting** at build time with separate light and dark themes ([Shiki](https://shiki.style)).
 - **Callouts** using GitHub's alert syntax (`> [!NOTE]`, `TIP`, `IMPORTANT`, `WARNING`, `CAUTION`).
-- **GitHub-flavoured Markdown**: tables, task lists, footnotes, strikethrough.
+- **GitHub-flavoured Markdown**: tables (with column alignment, scrollable on small screens), task lists, footnotes, strikethrough.
 - **Dark mode** that follows the visitor's system setting, with no toggle script.
 - **Drafts and updated dates** in the front matter.
 - **RSS feed**, **sitemap**, canonical URLs and Open Graph tags.
 - **Print stylesheet** that strips navigation and switches code to black on white.
 - **Mobile navigation without JavaScript** (CSS only).
 - **Self-hosted font.** No requests to third parties, no trackers, no cookies.
-- **Deploy script** (`tar` + `ssh`, atomic release switch) and an example Nginx config.
+- **Deploy script** (`tar` + `ssh`, atomic release switch, rollback) and an example Nginx config.
+- **Checked on every push**: type check, unit tests for the Markdown plugins, and a build verifier that fails on any `<script>`, third-party URL, broken internal link or leaked draft.
 
 ## Quick start
 
@@ -57,21 +58,23 @@ npm run dev
 Open http://localhost:4321. Production build:
 
 ```bash
-npm run build      # output goes to dist/
-npm run preview    # serve dist/ locally
+SITE_URL=https://example.com npm run build   # output goes to dist/
+npm run preview                              # serve dist/ locally
 ```
 
 ## Make it yours
 
 Everything personal lives in one file, [`site.config.ts`](site.config.ts): site title, tagline, description, navigation, social links, footer text and the number of posts on the home page.
 
-Set the public URL at build time so the feed, sitemap and canonical links are correct:
+Set the public URL at build time. The canonical links, Open Graph URLs, RSS feed, sitemap and `robots.txt` are all generated from it:
 
 ```bash
 SITE_URL=https://example.com npm run build
 ```
 
-Also update the `Sitemap:` line in `public/robots.txt`.
+Without `SITE_URL` the build falls back to `http://localhost:4321` and prints a warning.
+
+Dates use the `locale` and `timeZone` settings in `site.config.ts`. The interface text (for example "Reading time") is English; to translate it, edit the components in `src/components` and `src/pages`.
 
 The colour palette and typography are CSS variables at the top of [`src/styles/global.css`](src/styles/global.css).
 
@@ -100,7 +103,9 @@ draft: true               # optional, hidden from production builds
 
 The file name becomes the URL: `src/content/blog/my-first-post.md` is served at `/blog/my-first-post/`.
 
-To add a page to the navigation, create a file in `src/content/pages` and add a matching entry to `nav` in `site.config.ts`.
+To add a page to the navigation, create a file in `src/content/pages` (subfolders work too, so `pages/docs/setup.md` is served at `/docs/setup/`) and add a matching entry to `nav` in `site.config.ts`.
+
+Category and tag names can contain any characters. Their URLs are derived automatically: `Łódź` becomes `/categories/lodz/`, `C++` becomes `/tags/c-plus-plus/`, and names in non-Latin scripts are kept as they are.
 
 Static files such as images go in `public/` and are referenced from the site root, for example `![Alt text](/images/photo.jpg)`.
 
@@ -115,28 +120,35 @@ src/
   components/             header, footer, post list
   layouts/BaseLayout.astro
   pages/                  routes: home, blog, categories, tags, RSS, 404
-  plugins/rehype-alerts.mjs   callout blocks
+  plugins/                callout blocks, scrollable tables
   styles/global.css       all styling
-  utils/posts.ts          sorting, grouping, reading time
-public/                   favicon, robots.txt, images
+  utils/posts.ts          sorting, grouping, slugs, dates, reading time
+public/                   favicon and images
 scripts/deploy.sh         upload dist/ to a server over SSH
+scripts/verify-build.mjs  checks a finished build (no scripts, no broken links, no drafts)
+tests/                    unit tests for the Markdown plugins
 deploy/nginx.conf.example example Nginx server block
 ```
 
 ## Deploying
 
-The build output is a folder of static files, so any static host works (Nginx, Caddy, Netlify, GitHub Pages, S3, ...).
+The build output is a folder of static files, so any static host that serves the site from the root of a domain works (Nginx, Caddy, Netlify, Cloudflare Pages, S3 behind a CDN, ...). Serving it from a sub-path, such as a GitHub Pages project site at `user.github.io/repo/`, is not supported, because all internal links are root-relative.
 
-To deploy to your own server over SSH:
+To deploy to your own Linux server over SSH:
 
 ```bash
+SITE_URL=https://example.com \
 DEPLOY_HOST=example.com \
 DEPLOY_USER=deploy \
 DEPLOY_PATH=/var/www/my-blog \
 npm run deploy
 ```
 
-[`scripts/deploy.sh`](scripts/deploy.sh) uploads `dist/` as a new release directory and atomically switches a `current` symlink to it, keeping the last five releases for rollback. It only needs `bash`, `tar` and `ssh` locally and `tar` on the server.
+[`scripts/deploy.sh`](scripts/deploy.sh) builds the site, uploads `dist/` as a new release directory and atomically switches a `current` symlink to it. It keeps the last five releases (`KEEP_RELEASES`) and never removes the live one. It needs `bash`, `tar` and `ssh` locally, and GNU tar and coreutils on the server.
+
+On Windows, run it from Git Bash and add `MSYS_NO_PATHCONV=1` in front of the command. Otherwise Git Bash rewrites `/var/www/my-blog` into a Windows path (the script detects this and stops).
+
+To roll back, point the symlink at an older release on the server: `ln -sfn releases/<old-release> current`.
 
 Point your web server's document root at `<DEPLOY_PATH>/current`. A ready-to-adapt Nginx server block is in [`deploy/nginx.conf.example`](deploy/nginx.conf.example). The demo walkthrough is also available as a post on the [demo site](https://demo.mikrus.dev/blog/deploy-to-your-own-server/).
 
@@ -147,11 +159,16 @@ Point your web server's document root at `<DEPLOY_PATH>/current`. A ready-to-ada
 | `npm run dev` | Development server with live reload (drafts visible) |
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the production build locally |
+| `npm run check` | Type-check the Astro and TypeScript code |
+| `npm test` | Unit tests for the Markdown plugins |
+| `npm run verify` | Check a finished build for scripts, third-party URLs, broken links and leaked drafts |
 | `npm run deploy` | Build and upload with `scripts/deploy.sh` |
 
 ## Notes on the demo content
 
-The demo site's author, employers and links are fictional placeholder content. Replace the files in `src/content` and the values in `site.config.ts` with your own.
+The demo site's author, employers and links are fictional placeholder content, released under the same MIT license as the code. Replace the files in `src/content` and the values in `site.config.ts` with your own.
+
+The template itself ships no JavaScript, and `npm run verify` enforces it. The live demo, however, is served through the hosting provider's CDN, which injects its own email-obfuscation script into pages that contain an email address. If you host the site yourself without such a CDN, your pages contain no scripts at all.
 
 ## Inspiration
 

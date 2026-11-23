@@ -10,6 +10,9 @@ Open the developer tools on this page and look at the network tab. You'll find o
 
 This wasn't an accident, and it isn't a limitation. It's the point of the template.
 
+> [!NOTE]
+> This demo is served through its hosting provider's CDN, which adds an email-obfuscation script to pages that show an email address. That script is not part of the template. Host the site yourself, without such a CDN, and the network tab shows exactly what is described here. `npm run verify` checks every build for scripts.
+
 ## What you get for free
 
 When a page is just HTML and CSS:
